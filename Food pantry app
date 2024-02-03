@@ -309,3 +309,66 @@ controlFile:(NSString*)aControlFile
 }
 #made four touch methods, accept third parameter#
 #after recieving touch events, scenes next job is to process the touches#
+- (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
+   view:(UIView*)aView {
+
+   for (UITouch *touch in touches) {
+       CGPoint originalTouchLocation = [touch locationInView:aView];
+
+       CGPoint touchLocation = [sharedGameController
+          adjustTouchOrientationForTouch:originalTouchLocation];
+
+       if (CGRectContainsPoint(joypadBounds, touchLocation) &&
+           !isJoypadTouchMoving) {
+           isJoypadTouchMoving = YES;
+           joypadTouchHash = [touch hash];
+           break;
+       }
+    }
+}
+#once inside method, loop runs through all touches in the touches set#
+[glView setMultipleTouchEnabled:YES];
+- (void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event view:(UIView*)aView {
+
+     for (UITouch *touch in touches) {
+           if ([touch hash] == joypadTouchHash && isJoypadTouchMoving) {
+
+               CGPoint originalTouchLocation = [touch
+                  locationInView:aView];
+               CGPoint touchLocation = [sharedGameController
+               adjustTouchOrientationForTouch:originalTouchLocation];
+
+               float dx = (float)joypadCenter.x - (float)touchLocation.x;
+               float dy = (float)joypadCenter.y - (float)touchLocation.y;
+
+               // Manhattan Distance
+               joypadDistance = abs(touchLocation.x - joypadCenter.x) +
+                  abs(touchLocation.y - joypadCenter.y);
+
+               directionOfTravel = atan2(dy, dx);
+            }
+   }
+}
+#processing taps#
+- (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event view:(UIView*)aView {
+   for (UITouch *touch in touches) {
+   CGPoint originalTouchLocation = [touch locationInView:aView];
+
+   CGPoint touchLocation = [sharedGameController
+      adjustTouchOrientationForTouch:originalTouchLocation];
+   if (CGRectContainsPoint(joypadBounds, touchLocation) &&
+       !isJoypadTouchMoving) {
+       isJoypadTouchMoving = YES;
+       joypadTouchHash = [touch hash];
+       continue;
+   }
+
+       if (touch.tapCount == 2) {
+              NSLog(@"Double Tap at X:%f Y:%f", touchLocation.x,
+                 touchLocation.y;
+       }
+
+  }
+}
+#checks tapcount of each touch and prints a message to the log if a double tap is found#
+#navigation feature of app#
