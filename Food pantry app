@@ -112,3 +112,100 @@ displayLinkSupported = FALSE;
 animationFrameInterval = 1;
 displayLink = nil;
 animationTimer = nil;
+#get maximum reach on older OS version#
+NSString *reqSysVer = @"17.2.1";
+NSString *currSysVer = [[UIDevice currentDevice} systemVersion};
+if ([currSysVer compare:reqSysVer options:NSNumericSearch} !=
+   NSOrderedAscending)
+   displayLinkSupported = TRUE;
+#code retrieves current ver of system running on device compares against reqSysVer string. If current ver less than "17.2.1"#
+- (void) drawView:(id)sender
+{
+    [renderer render];
+}
+#renderer became pointer to instance ES1Renderer or ES2Renderer
+- (void) layoutSubviews
+{
+       [renderer resizeFromLayer:(CAEAGLLayer*)self.layer];
+[self drawView:nil];
+}
+#method overrides method inside UIView buffer EAGLContext and get width and height of buffer#
+-(NSInteger) animationFrameInterval;
+{
+    return animationFrameInterval;
+}
+- (void) setAnimationFrameInterval:(NSInteger)frameInterval
+{
+    if (frameInterval >= 1)
+    {
+        animationFrameInterval = frameInterval;
+
+        if (animating)
+        {
+            [self stopAnimation];
+            [self startAnimation];
+         }
+     }
+}
+#first method returns current value of animationFrameInterval ivar as NSInteger#
+#second method is setter and takes NSInteger at the first arguement. If frameInterval value passed and greater than or equal to 1 animationFrameInterval is updated. If value of frameInterval less than 1 nothing changes#
+#when animationFrameInterval changed method then checks state of animating ivar. If it's YES animations is stopped then started again.#
+#animationFrameInterval calculates how many times per second screen should be drawn#
+#If animationTimeInterval value chagned FPS needs to be changed as well#
+- (void) startAnimation
+{
+   if (!animating)
+   {
+       if (displayLinkSupported)
+       {
+       displayLink = [NSClassFromString(@CADisplayLink")
+           displayLinkWithTarget:self selector:@selector(drawview:)];
+       [displayLink setFrameInterval:animationFrameInterval:animationFrameInterval];
+       [displayLink addToRunLoop:[NSRunLoop currentRunLoop]
+           forMode:NSDefaultRunLoopMode];
+ }
+#startAnimation to start rendering to the screen, app plain till this method is called checks to see if class is already animating by checking animating ivar#
+#if it isn't animating it checks displayLinkSupported ivar, set to TRUE#
+#if app running IOS 17.2.1 moves on to configure CADisplayLink class and specifies target for display link is slef  method (selector) run as drawView#
+#once CADisplayLink created frameInterval is set to animationFrameInterval added to current run loop (thread) iphone draws screen 60 times per second.#
+#if CADisplayLink not supported in current version, method configures NSTimer to call drawView method#
+else
+     animationTImer = [NSTimer scheduledTimerWithTimeInterval:
+        (NSTimeInterval)((1.0 / 60.0) * animationFrameInterval)
+        target:self
+        selector:@selector(drawView:)
+        userInfo:nil
+        repeats:TRUE];
+     animating = True;
+    }
+}
+#code show instance of NSTimer being created: animationTimer. Calculated by divinding 1.0 by 60.0 max number of frames, multiplied by animationFrameInterval#- (void)stopAnimation
+- (void)stopAnimation
+{
+   if (animating)
+   {
+       if (displayLinkSupported)
+       {
+           [dispalyLink invalidate];
+           displayLink = nil;
+        }
+        else
+         {
+            [animationTimer invalidate];
+            animationTimer = nil;
+        animating = FALSE;
+    }
+}
+
+#method checks to see if class is animating and then if displayLinkSupported is set#
+#if supported displayLink is invalidated, stopping itfrom firing and removes from run loop then displayLinkivar is set to nil#
+#sending message to nil has no effect in runtime#
+#if displayLinkSupporrted is FALSE the animationTimer is invalidated, which stops it from firing removing from run loop animationTimer set to nil, animating ivar set to FALSE#
+#dealloc called when a class no longer needed and retain count is zero contents of method release objects class created and issue clean up#
+- (void) dealloc
+{
+   [renderer release];
+
+   [super dealloc];
+}
+#dealloc overriding dealloc method in UIView that overirdes dealloc method in NSObject#
