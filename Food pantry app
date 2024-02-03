@@ -291,3 +291,21 @@ controlFile:(NSString*)aControlFile
   return nil;
 }
 #error logged if sprite not found#
+- (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event
+#starting phase new touch detection#
+- (void)touchesBegan:(NSSet*)touches withEvent:(UIEvent*)event {
+ [[sharedGameController currentScene] touchesBegan:touches withEvent:event
+     view:self];
+}
+
+-(void)touchesMoved:(NSSet*)touches withEvent:(UIEvent*)event {
+ [[sharedGameController currentScene] touchesEnded:touches withEvent:event
+     view:self];
+}
+
+-(void)touchesCancelled:(NSSet*)touches withEvent:(UIEvent*)event {
+ [[sharedGameController currentScene] touchesCancelled:touches
+    withEvent:event view:self];
+}
+#made four touch methods, accept third parameter#
+#after recieving touch events, scenes next job is to process the touches#
