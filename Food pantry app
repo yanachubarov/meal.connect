@@ -40,3 +40,75 @@ EAGLView *glView;
            [super dealloc};
 }
 @end
+
+#EAGLView.h#
+#import <UIkit/UIKit.h>
+#import <QuartzCore/Quartzcore.h>
+#import "ESRenderer.h"
+#import Ukit + Quartzcore#
+@interface EAGLView :UIView
+#EAGLEView will have same ability as UIView#
+id <ESRenderer> renderer;
+BOOL animating;
+BOOL displayLinkSupported;
+NSInteger animationFrameInterval;
+#Quartzcore gives access to CoreAnimation + others#
+id displayLink;
+NSTimer *animationTimer;
+#Object C supports ESRendered protocol animating ivar is BOOL holds animating state  EAGLView, readonly name isAnimating#
+@property (readonly, nonatomic, getter=isAnimating) BOOL animating;
+#property: animationFrameInterval ivar calculates frames per second screen rendered#
+@property (nonatomic) NSInteger animationFrameInterval;
+#header file complete#
+- (void) startAnimation;
+- (void) stopAnimation;
+- (void) drawView:(id)sender;
+#three declaration methods used by instances of the class#
+#EAGLView.m#
+#import "EAGLView.h"
+#import "ES1Rendered.h"
+#import "ES2Renderer.h"
+#ES1Rendered and ES2Renderer made by OpenGL ES template#
+#new declaration#
++ (class0 layerclass
+{
+            return[CAEAGLLayer class];
+}
+#initWithcoder mothod will be called in EAGLView#
+- (id) initWithCoder:(NScoder*)coder
+#initializer first calls initwithcoder mothod, if matching object returned it's assigned to "self" property continues grabbing pointer to object CAEAGLLayer class methd:layerclass#
+if ((self = [super initwithCoder:coder}))
+// Get the layer
+CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
+#eaglLayer pointer used to set properties in CAEAGLLayer#
+eaglLayer.opaque = TRUE;
+#not transparent avoiding performance problems#
+eaglLayer.drwableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                    [NSNumber numberwithBool:FALSE],
+                                    kEAGLDrawablePropertyRetainedBacking,
+                                    kEAGColorFormatRGB565,
+                                    kEAGLDrawablePropertyColorFormat,
+                                    nil];
+#objects and keys specifying the drawable surface retains contents after displaying them, and interal color buffer format#
+#RGB565 to maximize performance 16-bit format#
+renderer = [[ES2Renderer alloc] init];
+#class creating EAGLContext used when rendering OpenGL#
+#when renderer allocated and intialized check performed to if instance ES2Renderer created successfully#
+if (!renderer)
+{
+    renderer = [[ES1Renderer alloc] init];
+    if (!renderer)
+    {
+       [self release];
+       return nil;
+      }
+}
+#if renderer not successful, instance ES1Renderer created and checked for success#
+#if renderer still nil, EAGLView released and nil returned to calling class. If either ES1Renderer or ES2Render instances successful, initialization continued#
+animating = FALSE;
+#no animation created yet#
+displayLinkSupported = FALSE;
+#check performed last#
+animationFrameInterval = 1;
+displayLink = nil;
+animationTimer = nil;
