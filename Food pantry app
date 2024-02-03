@@ -209,3 +209,40 @@ else
    [super dealloc];
 }
 #dealloc overriding dealloc method in UIView that overirdes dealloc method in NSObject#
+#configuring view port renders maps visualization beyond standard map SDKs#
+g1Viewport (0, 0, backingWidth , backingHeight);
+#specifies 2D window into which is being rendered#
+#first two parameters specify width and height#
+glMatrixMode(GL_MODELVIEW) ;
+glLoadIdentitiy();
+#identity matrix loaded so it can apply the transformations#
+glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+glDisable(GL_DEPTH_TEST);
+#manages z-indexing (scene rendered back to front so object sat back of scene appear behind those at front#
+glEnableClientState(GL_Vertex_ARRAY) ;
+glEnableClientState(GL_COLOR_ARRAY) ;
+#used to tell OpenGL ES that we're providing array of colors to be used when rendering the screen#
+#create spritesheet#
+static NSMutableDictionary cachedspritesheets = nil;
+
++ (SpriteSheet*)spriteSheetForImageNamed:(NSString*)aImageName
+   spriteSize:(CGSize)aSpriteSize spacing:(NSUInteger)aSpacing
+   margin:(NSUInteger)aMargin imageFilter:(GLenum)aFilter {
+
+   SpriteSheet *cachedSpriteSheet;
+
+   if (!cachedSpriteSheets)
+       cachedSpriteSheets = [[NSMutableDictionary alloc] init];
+
+   if(cachedSpriteSheet = [cachedSpriteSheets objectForKey:aImageName])
+       return cachedSpriteSheet;
+
+   cachedSpriteSheet = [[SpriteSheet alloc]
+       initWithImageNamed:aImageName spriteSize:aSpriteSize
+       spacing:aspacing margin:aMargin imageFilter:aFilter];
+   [cachedSpriteSheets setObject:cachedSpriteSheet forKey:aImageName];
+   [cachedSpriteSheet release];
+
+   return cachedSpriteSheet;
+}
+#spriteSheetForImageNamed:spriteSize:spacing:margin:imageFilter:method#
