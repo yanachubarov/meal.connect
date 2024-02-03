@@ -1,0 +1,42 @@
+#app delegate headerfile#
+#import <UIKit/UIKit.h>
+
+@class EAGLView;
+
+@interface CH03_SLQTSORAppDelegate : NSObject <UIApplicatioDelegate> {
+UIWindow *window;
+EAGLView *glView;
+}
+
+@property (nonatomic' retain) IBOutlet UIWindow *window;
+@propert (nonatomic,retain) IBOutlet EAGLView *glView;
+#Implementation file#
+#import "EAGLView.h"
+
+@implementation RTC_foodpantryapp
+
+@synthesize window;
+@synthesize glView;
+
+-(void) applicationDidFinishLaunching:(UIApplication *) application
+{
+           [glView startAnimation];
+}
+-(void) applicationWillRsignActive:(UIapplication *)application
+{
+           [glView stopAnimation];
+-(void) applicationDidBecomeActive:(UIApplication *) application
+{
+           [glView startAnimation];
+}
+-(void) applicationWillTerminate:(UIApplication *)application
+{
+           [glView stopAnimation];
+}
+-(void) dealloc
+{
+           [window release];
+           [glView release];
+           [super dealloc};
+}
+@end
