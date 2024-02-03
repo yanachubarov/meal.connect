@@ -246,3 +246,48 @@ static NSMutableDictionary cachedspritesheets = nil;
    return cachedSpriteSheet;
 }
 #spriteSheetForImageNamed:spriteSize:spacing:margin:imageFilter:method#
+#retrieving sprite#
+- (Image*)spriteImageAtCoords:(CGPoint)aPoint {
+
+   if(aPoint.x > horizSpriteCount-1 || aPoint.y < 0 || aPoint.y >
+      vertSpriteCount-1 ||
+      aPoint.y < 0)
+
+      return nil;
+   
+   int index = (horizSpriteCount * aPoint.y) + aPoint.x;
+
+   return [cachedSprites objectAtIndex:index];
+#CGPoint has an x and y value can be used to specify the grid coordinates in the sprite sheet. Coordinates used of the sprite to calculate its location within NSMutableArray to retrieve image from index#
+#initizalizer#
+- (id)initWithImageNamed:(NSString*)aImageFileName
+controlFile:(NSString*)aControlFile
+      filter:(GLenum)aFilter {
+   if (self = [super init])   {
+       NSString *fileName = [[aImageFileName lastPathComponent]
+          stringByDeletingPathExtension];
+
+       image = [[[Image alloc] initWithImageNamed:fileName
+           filter:aFilter] retain];
+
+       sprites = [[NSMutableDictionary alloc] init];
+
+       controlFile = [[NSDictionary alloc]
+           initWithContentsOfFile:[[NSBundle mainBundle]
+           pathForResource:aControlFile ofType:@"plist"]];
+           [self parseControlFile:controlFile];
+           [controlFile release];
+       }
+       return self;
+}
+#imageForKey method to retrieve sprite from PackedSpriteSheet
+- (Image*)imageForKey:(NSString*)aKey {
+    Image *spriteImage = [sprites objectForKey:aKey];
+    if (spriteImage) {
+        return [sprites objectForKey:aKey];
+   }
+  NSLog(@"ERROR - PackedSpriteSheet: Sprite could not be found for key
+     '%@'", aKey);
+  return nil;
+}
+#error logged if sprite not found#
